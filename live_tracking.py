@@ -4,10 +4,9 @@ from streamlit.components.v1 import html
 st.set_page_config(page_title="Live Tracker", layout="wide")
 st.title("📍 Live Location Tracker with Google Maps")
 
-# Replace with your actual API key
+# Use your own Google API Key here or set it in secrets.toml for production
 google_api_key = "AIzaSyBUniW-P4OVS7-iprYSuyVOv5oXuzLI9Lc"
 
-# Google Maps + JavaScript HTML inside Streamlit
 map_html = f"""
 <!DOCTYPE html>
 <html>
@@ -38,7 +37,8 @@ map_html = f"""
     <div id="map"></div>
 
     <script>
-      let map, marker;
+      let map;
+      let marker;
 
       function initMap() {{
         const defaultLocation = {{ lat: 20.5937, lng: 78.9629 }};
@@ -51,32 +51,45 @@ map_html = f"""
         const input = document.getElementById("search-box");
         const searchBox = new google.maps.places.SearchBox(input);
 
-        map.addListener("bounds_changed", () => {{
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', () => {{
           searchBox.setBounds(map.getBounds());
         }});
 
-        searchBox.addListener("places_changed", () => {{
+        searchBox.addListener('places_changed', () => {{
           const places = searchBox.getPlaces();
-          if (places.length === 0) return;
+
+          if (places.length === 0) {{
+            return;
+          }}
 
           const place = places[0];
-          if (!place.geometry) {{
+
+          if (!place.geometry || !place.geometry.location) {{
             alert("No details available for input: " + place.name);
             return;
           }}
 
-          // Fix: Set search box input value to place name or formatted address
-          input.value = place.formatted_address || place.name || "";
-
+          // Center map to place location and zoom in
           map.setCenter(place.geometry.location);
           map.setZoom(14);
 
+          // Remove old marker if exists
           if (marker) marker.setMap(null);
+
+          // Add new marker at the place location
           marker = new google.maps.Marker({{
-            map,
+            map: map,
             position: place.geometry.location,
             title: place.name,
           }});
+
+          // Optionally, update the search box value to formatted address or place name
+          if (place.formatted_address) {{
+            input.value = place.formatted_address;
+          }} else if (place.name) {{
+            input.value = place.name;
+          }}
 
           startLiveTracking();
         }});
@@ -93,7 +106,7 @@ map_html = f"""
 
               if (!marker) {{
                 marker = new google.maps.Marker({{
-                  map,
+                  map: map,
                   position: pos,
                   title: "You are here!",
                 }});
@@ -123,5 +136,4 @@ map_html = f"""
 </html>
 """
 
-# Embed in Streamlit
 html(map_html, height=700)

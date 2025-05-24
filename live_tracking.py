@@ -14,7 +14,7 @@ map_html = f"""
   <head>
     <style>
       #map {{
-        <div> height: 90vh; </div>
+        height: 90vh;
         width: 100%;
       }}
       #search-box {{
@@ -64,6 +64,9 @@ map_html = f"""
             alert("No details available for input: " + place.name);
             return;
           }}
+
+          // Fix: Set search box input value to place name or formatted address
+          input.value = place.formatted_address || place.name || "";
 
           map.setCenter(place.geometry.location);
           map.setZoom(14);

@@ -5,7 +5,7 @@ st.set_page_config(page_title="Live Tracker", layout="wide")
 st.title("📍 Live Location Tracker with Google Maps")
 
 # Replace with your actual API key
-google_api_key = st.secrets["google_maps_api_key"]
+google_api_key = "AIzaSyBUniW-P4OVS7-iprYSuyVOv5oXuzLI9Lc"
 
 # Google Maps + JavaScript HTML inside Streamlit
 map_html = f"""

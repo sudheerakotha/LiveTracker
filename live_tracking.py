@@ -14,7 +14,7 @@ map_html = f"""
   <head>
     <style>
       #map {{
-        height: 90vh;
+        <div> height: 90vh; </div>
         width: 100%;
       }}
       #search-box {{
